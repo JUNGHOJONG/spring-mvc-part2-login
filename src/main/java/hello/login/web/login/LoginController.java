@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 @Slf4j
 @RequiredArgsConstructor
 @Controller
@@ -24,7 +27,7 @@ public class LoginController {
     }
 
     @PostMapping("login")
-    public String login(@Validated @ModelAttribute LoginForm loginForm, BindingResult bindingResult) {
+    public String login(@Validated @ModelAttribute LoginForm loginForm, BindingResult bindingResult, HttpServletResponse response) {
 
         if (bindingResult.hasErrors()) {
             return "/login/loginForm";
@@ -39,6 +42,10 @@ public class LoginController {
         }
 
         log.info("login={}", loginForm);
+
+        // 쿠키를 만들어 웹 브라우저에 반환한다
+        Cookie cookieId = new Cookie("memberId", String.valueOf(loginMember.getId()));
+        response.addCookie(cookieId);
 
         return "redirect:/";
     }
