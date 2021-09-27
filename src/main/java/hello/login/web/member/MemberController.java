@@ -32,8 +32,10 @@ public class MemberController {
 
         if (bindingResult.hasErrors()) {
             log.info("bindingResult={}", bindingResult);
-            return "/items/addForm";
+            return "/members/addMemberForm";
         }
+
+        log.info("add={}", member);
 
         memberRepository.save(member);
 
