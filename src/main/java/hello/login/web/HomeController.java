@@ -48,10 +48,6 @@ public class HomeController {
     @GetMapping("/")
     public String loginHomeV2(HttpServletRequest request, Model model) {
 
-        if (request.getCookies() == null) {
-            return "home";
-        }
-
         Member loginMember = (Member) sessionManager.getSession(request);
 
         if (loginMember == null) {
@@ -62,21 +58,4 @@ public class HomeController {
         return "loginHome";
     }
 
-//    @PostMapping("/logout")
-    public String logoutHomeV1(HttpServletResponse response) {
-        expireCookie(response, "memberId");
-        return "redirect:/";
-    }
-
-    @PostMapping("/logout")
-    public String logoutHomeV2(HttpServletRequest request, HttpServletResponse response) {
-        sessionManager.expire(request, response);
-        return "redirect:/";
-    }
-
-    private void expireCookie(HttpServletResponse response, String cookieName) {
-        Cookie cookie = new Cookie(cookieName, null);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-    }
 }

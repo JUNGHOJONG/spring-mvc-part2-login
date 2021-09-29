@@ -1,6 +1,5 @@
 package hello.login.web.session;
 
-import hello.login.domain.member.Member;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Cookie;
