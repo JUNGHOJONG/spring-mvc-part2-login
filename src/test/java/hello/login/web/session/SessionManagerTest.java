@@ -27,7 +27,7 @@ public class SessionManagerTest {
         assertThat(findSession).isEqualTo(member);
 
         // 세션 만료
-        sessionManager.expire(request);
+        sessionManager.expire(request, response);
         Object expiredSession = sessionManager.getSession(request);
         assertThat(expiredSession).isNull();
     }
