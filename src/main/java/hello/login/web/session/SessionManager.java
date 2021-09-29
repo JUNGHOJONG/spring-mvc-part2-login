@@ -52,10 +52,12 @@ public class SessionManager {
     /**
      * 소멸
      */
-    public void expire(HttpServletRequest request) {
+    public void expire(HttpServletRequest request, HttpServletResponse response) {
         Cookie sessionCookie = findCookie(request);
         if (sessionCookie != null) {
             sessionStore.remove(sessionCookie.getValue());
+            sessionCookie.setMaxAge(0);
+            response.addCookie(sessionCookie);
         }
     }
 }

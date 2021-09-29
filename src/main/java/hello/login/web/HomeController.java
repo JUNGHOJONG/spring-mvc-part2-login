@@ -2,6 +2,7 @@ package hello.login.web;
 
 import hello.login.domain.member.Member;
 import hello.login.domain.member.MemberRepository;
+import hello.login.web.session.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
@@ -19,14 +21,15 @@ import javax.servlet.http.HttpServletResponse;
 public class HomeController {
 
     private final MemberRepository memberRepository;
+    private final SessionManager sessionManager;
 
 //    @GetMapping("/")
     public String home() {
         return "home";
     }
 
-    @GetMapping("/")
-    public String loginHome(@CookieValue(name = "memberId", required = false) Long memberId, Model model) {
+//    @GetMapping("/")
+    public String loginHomeV1(@CookieValue(name = "memberId", required = false) Long memberId, Model model) {
 
         if (memberId == null) {
             return "home";
@@ -42,9 +45,32 @@ public class HomeController {
         return "loginHome";
     }
 
-    @PostMapping("/logout")
-    public String logoutHome(HttpServletResponse response) {
+    @GetMapping("/")
+    public String loginHomeV2(HttpServletRequest request, Model model) {
+
+        if (request.getCookies() == null) {
+            return "home";
+        }
+
+        Member loginMember = (Member) sessionManager.getSession(request);
+
+        if (loginMember == null) {
+            return "home";
+        }
+
+        model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+
+//    @PostMapping("/logout")
+    public String logoutHomeV1(HttpServletResponse response) {
         expireCookie(response, "memberId");
+        return "redirect:/";
+    }
+
+    @PostMapping("/logout")
+    public String logoutHomeV2(HttpServletRequest request, HttpServletResponse response) {
+        sessionManager.expire(request, response);
         return "redirect:/";
     }
 
