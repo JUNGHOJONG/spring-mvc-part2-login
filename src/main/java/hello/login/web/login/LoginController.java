@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -78,7 +79,7 @@ public class LoginController {
         return "redirect:/";
     }
 
-    @PostMapping("login")
+//    @PostMapping("login")
     public String loginV3(@Validated @ModelAttribute LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
@@ -106,6 +107,31 @@ public class LoginController {
     public String logoutV1(HttpServletResponse response) {
         expireCookie(response, "memberId");
         return "redirect:/";
+    }
+
+    @PostMapping("login")
+    public String loginV4(@Validated @ModelAttribute LoginForm loginForm, BindingResult bindingResult,
+                          @RequestParam(defaultValue = "/") String redirectURL, HttpServletRequest request) {
+
+        if (bindingResult.hasErrors()) {
+            return "/login/loginForm";
+        }
+
+        // biz rule
+        Member loginMember = loginService.login(loginForm.getLoginId(), loginForm.getPassword());
+
+        if (loginMember == null) {
+            bindingResult.reject("loginFail", "아이디 혹은 비밀번호가 일치하지 않습니다.");
+            return "/login/loginForm";
+        }
+
+        log.info("login={}", loginForm);
+
+        // 세션 생성 후, 세션Id를 담은 쿠키 반환
+        HttpSession session = request.getSession();
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
+
+        return "redirect:" + redirectURL;
     }
 
 //    @PostMapping("/logout")
