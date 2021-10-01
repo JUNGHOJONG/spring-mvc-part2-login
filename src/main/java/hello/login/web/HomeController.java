@@ -2,6 +2,7 @@ package hello.login.web;
 
 import hello.login.domain.member.Member;
 import hello.login.domain.member.MemberRepository;
+import hello.login.web.argumentresolver.Login;
 import hello.login.web.session.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,8 +81,25 @@ public class HomeController {
         return "loginHome";
     }
 
-    @GetMapping("/")
+//    @GetMapping("/")
     public String loginHomeV4(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, HttpServletRequest request, Model model) {
+
+        // 세션Id가 없거나, 세션 저장소에 일치하는 객체 값이 존재하지 않을 때
+        if (loginMember == null) {
+            return "home";
+        }
+
+        model.addAttribute("member", loginMember);
+
+        return "loginHome";
+    }
+
+    /**
+     * ArgumentResolver 활용
+     * @Login 커스터마이징
+     */
+    @GetMapping("/")
+    public String loginHomeV5(@Login Member loginMember, Model model) {
 
         // 세션Id가 없거나, 세션 저장소에 일치하는 객체 값이 존재하지 않을 때
         if (loginMember == null) {
